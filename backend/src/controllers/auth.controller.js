@@ -1,32 +1,47 @@
-const { ZodError } = require('zod');
-const { signupSchema } = require('../validations/auth.validation');
-const { createUser } = require('../services/auth.service');
+const {
+  signupSchema,
+  loginSchema,
+} = require("../validations/auth.validation");
+const {
+  createUser,
+  loginUser,
+} = require("../services/auth.service");
 
-const signupHandler = async (req, res) => {
+const signup = async (req, res) => {
   try {
-    const parsedData = signupSchema.parse(req.body);
-    const user = await createUser(parsedData);
+    const validatedData = signupSchema.parse(req.body);
+    const user = await createUser(validatedData);
     return res.status(201).json(user);
   } catch (err) {
-    if (err instanceof ZodError) {
-      return res.status(400).json({
-        error: err.issues[0].message,
-      });
+    if (err.name === "ZodError") {
+      return res.status(400).json({ error: err.errors[0].message });
     }
-
     if (err.statusCode) {
-      return res.status(err.statusCode).json({
-        error: err.message,
-      });
+      return res.status(err.statusCode).json({ error: err.message });
     }
+    console.error("Signup error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
 
-    console.error(err); 
-    return res.status(500).json({
-      error: 'Internal Server Error',
-    });
+const login = async (req, res) => {
+  try {
+    const validatedData = loginSchema.parse(req.body);
+    const result = await loginUser(validatedData);
+    return res.status(200).json(result);
+  } catch (err) {
+    if (err.name === "ZodError") {
+      return res.status(400).json({ error: err.errors[0].message });
+    }
+    if (err.statusCode) {
+      return res.status(err.statusCode).json({ error: err.message });
+    }
+    console.error("Login error:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
 module.exports = {
-  signupHandler,
-};  
+  signup,
+  login,
+};
