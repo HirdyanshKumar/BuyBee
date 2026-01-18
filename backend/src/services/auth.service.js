@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const prisma = require("../config/db");
+const prisma = require("../config/connectdb");
 
 const createUser = async ({ name, email, password }) => {
   const existingUser = await prisma.user.findUnique({

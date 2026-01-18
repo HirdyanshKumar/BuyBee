@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 
-const verifyuser
+const verifyAuth
  = async (req, res, next) => {
     try {
         const authHeader = req.headers['authorization'];
@@ -23,7 +23,6 @@ const verifyuser
 };
 
 module.exports = {
-    verifyuser
-    ,
+    verifyAuth,
 };
 
