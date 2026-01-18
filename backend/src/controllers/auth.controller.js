@@ -40,8 +40,15 @@ const login = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+const logout = async (req, res) => {
+  return res.status(200).json({
+    message: "Logged out successfully",
+  });
+};
+
 
 module.exports = {
   signup,
   login,
+  logout
 };
