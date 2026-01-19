@@ -97,7 +97,94 @@ const listUserOrders = async (userId) => {
   }));
 };
 
+const getOrderDetails = async(orderId,requester)=>{
+    const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      items: {
+        select: {
+          product_name: true,
+          price: true,
+          quantity: true,
+        },
+      },
+    },
+  });
+
+  if (!order) {
+    const error = new Error("Order not found");
+    error.statusCode = 404;
+    throw error;
+  }
+  if (requester.role !== "ADMIN" && order.userId !== requester.id) {
+    const error = new Error("Access denied");
+    error.statusCode = 403;
+    throw error;
+  }
+  return {
+    orderId: order.id,
+    status: order.status,
+    totalAmount: order.total_amount,
+    createdAt: order.created_at,
+    items: order.items.map((i) => ({
+      productName: i.product_name,
+      price: i.price,
+      quantity: i.quantity,
+    })),
+  };
+};
+
+const listAllOrders = async () => {
+  const orders = await prisma.order.findMany({
+    orderBy: {
+      created_at: "desc",
+    },
+    select: {
+      id: true,
+      userId: true,
+      status: true,
+      total_amount: true,
+      created_at: true,
+    },
+  });
+
+  return orders.map((o) => ({
+    orderId: o.id,
+    userId: o.userId,
+    status: o.status,
+    totalAmount: o.total_amount,
+    createdAt: o.created_at,
+  }));
+};
+
+const updateOrderStatus = async (orderId, status) => {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+  });
+
+  if (!order) {
+    const error = new Error("Order not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const updatedOrder = await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      status,
+    },
+  });
+
+  return {
+    orderId: updatedOrder.id,
+    status: updatedOrder.status,
+    updatedAt: updatedOrder.created_at,
+  };
+};
 module.exports = {
   createOrder,
   listUserOrders,
+  getOrderDetails,
+  listAllOrders,
+  updateOrderStatus,
 };
