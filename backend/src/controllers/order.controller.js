@@ -1,5 +1,5 @@
-const { createOrderSchema } = require("../validations/order.validation");
-const { createOrder,listUserOrders } = require("../services/order.service");
+const { createOrderSchema,updateOrderStatusSchema } = require("../validations/order.validation");
+const { createOrder,listUserOrders,getOrderDetails,updateOrderStatus } = require("../services/order.service");
 
 const createOrderHandler = async (req, res) => {
   try {
@@ -43,7 +43,28 @@ const listUserOrdersHandler = async (req, res) => {
     });
   }
 };
+const getOrderDetailsHandler = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const requester = req.user; 
+
+    const order = await getOrderDetails(orderId, requester);
+
+    return res.status(200).json(order);
+  } catch (err) {
+    if (err.statusCode) {
+      return res.status(err.statusCode).json({ error: err.message });
+    }
+
+    console.error("Get order details error:", err);
+    return res.status(500).json({
+      error: "Failed to fetch order details",
+    });
+  }
+};
+
 module.exports = {
   createOrderHandler,
-    listUserOrdersHandler,
+  listUserOrdersHandler,
+  getOrderDetailsHandler,
 };
