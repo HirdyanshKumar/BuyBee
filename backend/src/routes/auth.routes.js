@@ -5,7 +5,7 @@ const {
   logout
 } = require("../controllers/auth.controller");
 const { verifyAuth } = require("../middlewares/auth.middleware");
-
+const { authRateLimiter } = require("../middlewares/rateLimit.middleware");
 
 const router = express.Router();
 

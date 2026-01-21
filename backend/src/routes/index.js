@@ -19,5 +19,5 @@ router.use("/admin/orders", adminOrdersRoutes);
 
 
 
-app.use(errorHandler)
+router.use(errorHandler)
 module.exports = router;
