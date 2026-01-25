@@ -1,10 +1,15 @@
+import { BrowserRouter } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import AppRoutes from "./routes/AppRoutes";
+
 function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-2xl font-semibold">
-        BuyBee Frontend Ready
-      </h1>
-    </div>
+    <BrowserRouter>
+      <Navbar />
+      <main className="p-6">
+        <AppRoutes />
+      </main>
+    </BrowserRouter>
   );
 }
 
